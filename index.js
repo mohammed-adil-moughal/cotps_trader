@@ -1,3 +1,4 @@
+require('dotenv').config()
 const request = require('request')
 const axios = require('axios')
 
@@ -66,7 +67,10 @@ const submitOrder = async (token, orderId) => {
 }
 
 const main = async () => {
-    let token = await loginUser('0727768794', 'K&m3itL8@3N9');
+    let password = process.env.PASSWORD;
+    let phoneNumber = process.env.PHONENUMBER;
+
+    let token = await loginUser(phoneNumber, password);
     const balance = await getBalance(token);
 
     const transactionInfo = await getTransactionInfo(token);
@@ -75,9 +79,11 @@ const main = async () => {
     if (balance > transactionInfo.deal_min_balance) {
         orderDetails = await getRandomTrade(token)
         submitResponse = await submitOrder(token, orderDetails.data.orderId)
-        if(submitResponse.code == 200) {
+        if (submitResponse.code == 200) {
             console.log("Trade Placed")
         }
+    } else {
+        console.log("No funds to use")
     }
 }
 
